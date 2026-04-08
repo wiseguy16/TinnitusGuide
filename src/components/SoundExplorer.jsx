@@ -189,8 +189,7 @@ export default function SoundExplorer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [status, setStatus] = useState("Choose a sound type, then press play.");
   const [isExporting, setIsExporting] = useState(false);
-  const [shareStatus, setShareStatus] = useState("");
-  const [exportedSample, setExportedSample] = useState(null);
+  const exportedSampleRef = useRef(null);
 
   if (!simulatorRef.current) {
     simulatorRef.current = new TinnitusSimulator();
@@ -203,20 +202,17 @@ export default function SoundExplorer() {
   }, [params, isPlaying]);
 
   useEffect(() => {
-    setExportedSample((current) => {
-      if (current?.url) {
-        window.URL.revokeObjectURL(current.url);
-      }
-      return null;
-    });
-    setShareStatus("");
+    if (exportedSampleRef.current?.url) {
+      window.URL.revokeObjectURL(exportedSampleRef.current.url);
+      exportedSampleRef.current = null;
+    }
   }, [params]);
 
   useEffect(() => () => {
-    if (exportedSample?.url) {
-      window.URL.revokeObjectURL(exportedSample.url);
+    if (exportedSampleRef.current?.url) {
+      window.URL.revokeObjectURL(exportedSampleRef.current.url);
     }
-  }, [exportedSample]);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -302,6 +298,11 @@ export default function SoundExplorer() {
 
   const currentMode = MODES.find((mode) => mode.value === params.mode) ?? MODES[0];
   const description = buildDescription(params, currentMode);
+  const canShareFiles = Boolean(
+    typeof navigator !== "undefined"
+      && navigator.share
+      && navigator.canShare,
+  );
 
   const applyMode = (mode) => {
     setParams((current) => ({
@@ -334,21 +335,17 @@ export default function SoundExplorer() {
     const blob = toMp3Blob(renderedBuffer);
     const fileName = buildExportFilename(params);
     const url = window.URL.createObjectURL(blob);
-
-    setExportedSample((current) => {
-      if (current?.url) {
-        window.URL.revokeObjectURL(current.url);
-      }
-      return { blob, fileName, url };
-    });
-
-    return { blob, fileName, url };
+    if (exportedSampleRef.current?.url) {
+      window.URL.revokeObjectURL(exportedSampleRef.current.url);
+    }
+    const sample = { blob, fileName, url };
+    exportedSampleRef.current = sample;
+    return sample;
   };
 
   const handleDownloadMp3 = async () => {
     try {
       setIsExporting(true);
-      setShareStatus("Preparing your 5-second MP3...");
       const sample = await createExportedSample();
       window.setTimeout(() => {
         const anchor = document.createElement("a");
@@ -358,10 +355,9 @@ export default function SoundExplorer() {
         anchor.click();
         anchor.remove();
       }, 0);
-      setShareStatus("Your MP3 is ready below, and a download should start automatically.");
     } catch (error) {
       console.error(error);
-      setShareStatus(
+      setStatus(
         error instanceof Error
           ? `We could not create the MP3 sample right now: ${error.message}`
           : "We could not create the MP3 sample right now.",
@@ -374,8 +370,7 @@ export default function SoundExplorer() {
   const handleShareMp3 = async () => {
     try {
       setIsExporting(true);
-      setShareStatus("Preparing your 5-second MP3...");
-      const sample = exportedSample ?? await createExportedSample();
+      const sample = exportedSampleRef.current ?? await createExportedSample();
       const file = new File([sample.blob], sample.fileName, { type: "audio/mpeg" });
 
       if (
@@ -388,17 +383,15 @@ export default function SoundExplorer() {
           text: "Here is a 5-second sample that matches what I hear most closely.",
           files: [file],
         });
-        setShareStatus("Sample shared.");
+        setStatus("Sample shared.");
         return;
       }
-
-      setShareStatus("Sharing is not supported here, but your MP3 is ready below to download.");
     } catch (error) {
       if (error?.name === "AbortError") {
-        setShareStatus("Sharing canceled.");
+        setStatus("Sharing canceled.");
       } else {
         console.error(error);
-        setShareStatus(
+        setStatus(
           error instanceof Error
             ? `We could not share the MP3 sample right now: ${error.message}`
             : "We could not share the MP3 sample right now.",
@@ -447,19 +440,23 @@ export default function SoundExplorer() {
           >
             {isExporting ? "Creating MP3..." : "Download 5-second MP3"}
           </button>
-          <button
-            className="ghost-button"
-            disabled={isExporting}
-            onClick={handleShareMp3}
-            type="button"
-          >
-            Share sample
-          </button>
+          {canShareFiles ? (
+            <button
+              className="ghost-button"
+              disabled={isExporting}
+              onClick={handleShareMp3}
+              type="button"
+            >
+              Share sample
+            </button>
+          ) : null}
+          <span className="explorer-helper muted-text">
+            A short MP3 can be useful to share with your provider before or during a visit.
+          </span>
         </div>
         <div className="explorer-status">
           <strong>{currentMode.label}</strong>
           <span>{status}</span>
-          {shareStatus ? <span>{shareStatus}</span> : null}
         </div>
       </div>
 
@@ -479,31 +476,6 @@ export default function SoundExplorer() {
           This view shows where the sample is carrying energy across low, mid,
           and high frequencies as you adjust the controls.
         </p>
-        <p className="muted-text">
-          You can export a 5-second MP3 from your current settings to text, email,
-          or play during an appointment.
-        </p>
-        {exportedSample ? (
-          <div className="export-card">
-            <div className="field-row">
-              <span>Generated sample</span>
-              <strong>5-second MP3</strong>
-            </div>
-            <audio className="export-audio" controls src={exportedSample.url}>
-              Your browser does not support audio playback.
-            </audio>
-            <div className="export-links">
-              <a
-                className="secondary-button export-link"
-                download={exportedSample.fileName}
-                href={exportedSample.url}
-              >
-                Download MP3
-              </a>
-              <span className="muted-text">{exportedSample.fileName}</span>
-            </div>
-          </div>
-        ) : null}
       </div>
 
       <div className="explorer-grid">

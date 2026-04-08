@@ -228,6 +228,11 @@ input[type="range"] {
   align-items: center;
 }
 
+.explorer-helper {
+  max-width: 32rem;
+  font-size: 0.95rem;
+}
+
 .explorer-status {
   display: grid;
   gap: 0.15rem;
@@ -250,31 +255,6 @@ input[type="range"] {
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.export-card {
-  display: grid;
-  gap: 0.9rem;
-  margin-top: 1rem;
-  padding: 1rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.export-audio {
-  width: 100%;
-}
-
-.export-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.export-link {
-  text-decoration: none;
 }
 
 .waveform-canvas {
@@ -386,6 +366,10 @@ input[type="range"] {
 
   .explorer-actions {
     width: 100%;
+  }
+
+  .explorer-helper {
+    max-width: none;
   }
 
   .hero-art {
