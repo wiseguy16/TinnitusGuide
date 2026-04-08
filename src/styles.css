@@ -1,0 +1,311 @@
+:root {
+  color: #f4efe6;
+  background:
+    radial-gradient(circle at top, rgba(217, 167, 111, 0.2), transparent 34%),
+    linear-gradient(180deg, #0f1820 0%, #162a36 50%, #091219 100%);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: #f4efe6;
+  background: transparent;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: #f0a768;
+}
+
+.page-shell {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.hero,
+.intro-grid,
+.sound-grid,
+.describe-grid,
+.care-grid {
+  display: grid;
+  gap: 1.2rem;
+  margin-top: 1.25rem;
+}
+
+.hero {
+  grid-template-columns: 1.1fr 0.9fr;
+  padding: 2.6rem;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 20, 28, 0.7);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.26);
+  align-items: center;
+}
+
+.hero h1 {
+  margin: 0.25rem 0 0.85rem;
+  max-width: 11ch;
+  font-size: clamp(2.8rem, 6vw, 5.3rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.hero-copy {
+  max-width: 58ch;
+  margin: 0;
+  color: rgba(244, 239, 230, 0.78);
+  font-size: 1.05rem;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+}
+
+.hero-tags span,
+.tag {
+  padding: 0.52rem 0.88rem;
+  border-radius: 999px;
+  background: rgba(240, 167, 104, 0.13);
+  border: 1px solid rgba(240, 167, 104, 0.28);
+  color: #ffd7aa;
+}
+
+.hero-art {
+  width: 100%;
+  max-width: 360px;
+  margin-left: auto;
+}
+
+.hero-ring {
+  fill: rgba(255, 255, 255, 0.06);
+  stroke: rgba(240, 167, 104, 0.58);
+  stroke-width: 3;
+}
+
+.hero-ring.soft {
+  stroke: rgba(255, 255, 255, 0.2);
+}
+
+.hero-wave {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.hero-wave.strong {
+  stroke: rgba(240, 167, 104, 0.82);
+  stroke-width: 5;
+}
+
+.hero-wave.soft {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+.intro-grid,
+.care-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sound-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.describe-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.panel {
+  padding: 1.5rem;
+  border-radius: 24px;
+  background: rgba(10, 20, 28, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+}
+
+.panel-heading h2,
+.panel-heading h3,
+.sound-card h3,
+.describe-card h3,
+.mode-card strong,
+.appointment-card h3 {
+  margin: 0;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  color: #f0a768;
+}
+
+.muted-text {
+  color: rgba(244, 239, 230, 0.66);
+}
+
+.sound-card,
+.describe-card,
+.mode-card,
+.appointment-example,
+.appointment-card {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sound-card,
+.describe-card {
+  padding: 1rem;
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.mode-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  color: #f4efe6;
+  text-align: left;
+}
+
+.mode-card span {
+  color: rgba(244, 239, 230, 0.7);
+  font-size: 0.93rem;
+}
+
+.mode-card.active {
+  background: rgba(240, 167, 104, 0.15);
+  border-color: rgba(240, 167, 104, 0.4);
+}
+
+.explorer-panel {
+  margin-top: 1.25rem;
+}
+
+.explorer-toolbar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.1rem;
+}
+
+.explorer-status {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.explorer-status span {
+  color: rgba(244, 239, 230, 0.72);
+}
+
+.explorer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.55rem;
+  color: rgba(244, 239, 230, 0.92);
+}
+
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.primary-button {
+  appearance: none;
+  border: 0;
+  border-radius: 16px;
+  padding: 0.95rem 1.15rem;
+  background: linear-gradient(135deg, #f0a768 0%, #f4cd86 100%);
+  color: #1c140d;
+  font-weight: 700;
+}
+
+.primary-button:hover,
+.mode-card:hover {
+  transform: translateY(-1px);
+}
+
+.appointment-card {
+  margin-top: 1.2rem;
+  padding: 1rem 1.1rem;
+}
+
+.appointment-card ul,
+.checklist {
+  margin: 0.8rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.appointment-example {
+  padding: 1rem 1.1rem;
+  margin-top: 1rem;
+}
+
+.appointment-panel {
+  margin-top: 1.25rem;
+}
+
+@media (max-width: 920px) {
+  .hero,
+  .intro-grid,
+  .sound-grid,
+  .describe-grid,
+  .care-grid,
+  .mode-grid,
+  .explorer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 2rem;
+  }
+
+  .explorer-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-art {
+    margin: 0;
+  }
+}
