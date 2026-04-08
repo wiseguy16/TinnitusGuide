@@ -11,6 +11,111 @@ function createNoiseBuffer(context) {
   return buffer;
 }
 
+function wireSimulationGraph(context, destination, params, noiseBuffer) {
+  const {
+    mode,
+    frequency,
+    loudness,
+    brightness,
+    roughness,
+    pulseRate,
+  } = params;
+
+  const outputGain = context.createGain();
+  outputGain.gain.value = clamp(loudness, 0, 0.35);
+  outputGain.connect(destination);
+
+  const startedNodes = [];
+
+  const makeOsc = (type, freq, gainValue) => {
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.value = gainValue;
+    osc.connect(gain);
+    gain.connect(outputGain);
+    startedNodes.push(osc);
+    return { osc, gain };
+  };
+
+  let primaryOsc = null;
+
+  if (mode === "ring") {
+    ({ osc: primaryOsc } = makeOsc("sine", frequency, 1));
+  }
+
+  if (mode === "hum") {
+    ({ osc: primaryOsc } = makeOsc("triangle", clamp(frequency * 0.35, 50, 300), 0.7));
+    makeOsc("sine", clamp(frequency * 0.7, 70, 420), 0.28);
+  }
+
+  if (mode === "buzz") {
+    ({ osc: primaryOsc } = makeOsc("square", clamp(frequency, 80, 2000), 0.6));
+    makeOsc("sawtooth", clamp(frequency * 1.02, 80, 2200), 0.22);
+  }
+
+  if (mode === "hiss" || mode === "pulse") {
+    const noiseSource = context.createBufferSource();
+    const noiseFilter = context.createBiquadFilter();
+    noiseSource.buffer = noiseBuffer;
+    noiseSource.loop = true;
+    noiseFilter.type = "bandpass";
+    noiseFilter.frequency.value = 800 + brightness * 5200;
+    noiseFilter.Q.value = 0.5 + roughness * 6;
+    noiseSource.connect(noiseFilter);
+    noiseFilter.connect(outputGain);
+    startedNodes.push(noiseSource);
+  }
+
+  if (mode === "pulse" || roughness > 0.01) {
+    const modulationOsc = context.createOscillator();
+    const modulationGain = context.createGain();
+    modulationOsc.type = mode === "pulse" ? "square" : "sine";
+    modulationOsc.frequency.value =
+      mode === "pulse" ? clamp(pulseRate, 0.4, 12) : 2 + roughness * 28;
+    modulationGain.gain.value =
+      mode === "pulse"
+        ? clamp(0.35 + roughness * 0.55, 0.2, 0.9)
+        : clamp(roughness * 0.22, 0, 0.18);
+    modulationOsc.connect(modulationGain);
+    modulationGain.connect(outputGain.gain);
+    outputGain.gain.value = clamp(loudness, 0, 0.28);
+    startedNodes.push(modulationOsc);
+  }
+
+  if (primaryOsc && mode !== "pulse") {
+    const detune = context.createOscillator();
+    const detuneGain = context.createGain();
+    detune.type = "sine";
+    detune.frequency.value = 0.2 + roughness * 7;
+    detuneGain.gain.value = mode === "ring" ? 18 + roughness * 70 : 4 + roughness * 24;
+    detune.connect(detuneGain);
+    detuneGain.connect(primaryOsc.detune);
+    startedNodes.push(detune);
+  }
+
+  startedNodes.forEach((node) => node.start(0));
+}
+
+export async function renderSimulationAudioBuffer(
+  params,
+  { duration = 5, sampleRate = 44100 } = {},
+) {
+  const frameCount = Math.floor(duration * sampleRate);
+  const OfflineAudioContextClass =
+    window.OfflineAudioContext || window.webkitOfflineAudioContext;
+
+  if (!OfflineAudioContextClass) {
+    throw new Error("Offline audio rendering is not supported in this browser.");
+  }
+
+  const offlineContext = new OfflineAudioContextClass(1, frameCount, sampleRate);
+  const noiseBuffer = createNoiseBuffer(offlineContext);
+  wireSimulationGraph(offlineContext, offlineContext.destination, params, noiseBuffer);
+  return offlineContext.startRendering();
+}
+
 export class TinnitusSimulator {
   constructor() {
     this.context = null;
@@ -146,7 +251,9 @@ export class TinnitusSimulator {
       this.modulationOsc.frequency.value =
         mode === "pulse" ? clamp(pulseRate, 0.4, 12) : 2 + roughness * 28;
       this.modulationGain.gain.value =
-        mode === "pulse" ? clamp(0.35 + roughness * 0.55, 0.2, 0.9) : clamp(roughness * 0.22, 0, 0.18);
+        mode === "pulse"
+          ? clamp(0.35 + roughness * 0.55, 0.2, 0.9)
+          : clamp(roughness * 0.22, 0, 0.18);
       this.modulationOsc.connect(this.modulationGain);
       this.modulationGain.connect(outputGain.gain);
       outputGain.gain.value = clamp(loudness, 0, 0.28);

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { TinnitusSimulator } from "../audio/simulator";
+import lamejsBundle from "lamejs/lame.all.js?raw";
+import { renderSimulationAudioBuffer, TinnitusSimulator } from "../audio/simulator";
 
 const MODES = [
   {
@@ -42,6 +43,54 @@ const INITIAL_STATE = {
   pulseRate: 2.5,
   loudness: 0.12,
 };
+
+const EXPORT_DURATION_SECONDS = 5;
+
+let cachedLamejs = null;
+
+function getLamejs() {
+  if (cachedLamejs) {
+    return cachedLamejs;
+  }
+
+  const factory = new Function(`${lamejsBundle}\nreturn lamejs;`);
+  cachedLamejs = factory();
+  return cachedLamejs;
+}
+
+function toMp3Blob(audioBuffer) {
+  const samples = audioBuffer.getChannelData(0);
+  const sampleRate = audioBuffer.sampleRate;
+  const lamejs = getLamejs();
+  const encoder = new lamejs.Mp3Encoder(1, sampleRate, 128);
+  const blockSize = 1152;
+  const mp3Chunks = [];
+
+  const pcmSamples = new Int16Array(samples.length);
+  for (let index = 0; index < samples.length; index += 1) {
+    const sample = Math.max(-1, Math.min(1, samples[index]));
+    pcmSamples[index] = sample < 0 ? sample * 32768 : sample * 32767;
+  }
+
+  for (let index = 0; index < pcmSamples.length; index += blockSize) {
+    const sampleChunk = pcmSamples.subarray(index, index + blockSize);
+    const mp3buf = encoder.encodeBuffer(sampleChunk);
+    if (mp3buf.length > 0) {
+      mp3Chunks.push(new Int8Array(mp3buf));
+    }
+  }
+
+  const finalBuffer = encoder.flush();
+  if (finalBuffer.length > 0) {
+    mp3Chunks.push(new Int8Array(finalBuffer));
+  }
+
+  return new Blob(mp3Chunks, { type: "audio/mpeg" });
+}
+
+function buildExportFilename(params) {
+  return `tinnitusguide-${params.mode}-${Math.round(params.frequency)}hz.mp3`;
+}
 
 function formatFrequency(value) {
   if (value >= 1000) {
@@ -139,6 +188,9 @@ export default function SoundExplorer() {
   const [params, setParams] = useState(INITIAL_STATE);
   const [isPlaying, setIsPlaying] = useState(false);
   const [status, setStatus] = useState("Choose a sound type, then press play.");
+  const [isExporting, setIsExporting] = useState(false);
+  const [shareStatus, setShareStatus] = useState("");
+  const [exportedSample, setExportedSample] = useState(null);
 
   if (!simulatorRef.current) {
     simulatorRef.current = new TinnitusSimulator();
@@ -149,6 +201,22 @@ export default function SoundExplorer() {
       simulatorRef.current.update(params);
     }
   }, [params, isPlaying]);
+
+  useEffect(() => {
+    setExportedSample((current) => {
+      if (current?.url) {
+        window.URL.revokeObjectURL(current.url);
+      }
+      return null;
+    });
+    setShareStatus("");
+  }, [params]);
+
+  useEffect(() => () => {
+    if (exportedSample?.url) {
+      window.URL.revokeObjectURL(exportedSample.url);
+    }
+  }, [exportedSample]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -259,6 +327,88 @@ export default function SoundExplorer() {
     );
   };
 
+  const createExportedSample = async () => {
+    const renderedBuffer = await renderSimulationAudioBuffer(params, {
+      duration: EXPORT_DURATION_SECONDS,
+    });
+    const blob = toMp3Blob(renderedBuffer);
+    const fileName = buildExportFilename(params);
+    const url = window.URL.createObjectURL(blob);
+
+    setExportedSample((current) => {
+      if (current?.url) {
+        window.URL.revokeObjectURL(current.url);
+      }
+      return { blob, fileName, url };
+    });
+
+    return { blob, fileName, url };
+  };
+
+  const handleDownloadMp3 = async () => {
+    try {
+      setIsExporting(true);
+      setShareStatus("Preparing your 5-second MP3...");
+      const sample = await createExportedSample();
+      window.setTimeout(() => {
+        const anchor = document.createElement("a");
+        anchor.href = sample.url;
+        anchor.download = sample.fileName;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+      }, 0);
+      setShareStatus("Your MP3 is ready below, and a download should start automatically.");
+    } catch (error) {
+      console.error(error);
+      setShareStatus(
+        error instanceof Error
+          ? `We could not create the MP3 sample right now: ${error.message}`
+          : "We could not create the MP3 sample right now.",
+      );
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleShareMp3 = async () => {
+    try {
+      setIsExporting(true);
+      setShareStatus("Preparing your 5-second MP3...");
+      const sample = exportedSample ?? await createExportedSample();
+      const file = new File([sample.blob], sample.fileName, { type: "audio/mpeg" });
+
+      if (
+        navigator.share
+        && navigator.canShare
+        && navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({
+          title: "TinnitusGuide sample",
+          text: "Here is a 5-second sample that matches what I hear most closely.",
+          files: [file],
+        });
+        setShareStatus("Sample shared.");
+        return;
+      }
+
+      setShareStatus("Sharing is not supported here, but your MP3 is ready below to download.");
+    } catch (error) {
+      if (error?.name === "AbortError") {
+        setShareStatus("Sharing canceled.");
+      } else {
+        console.error(error);
+        setShareStatus(
+          error instanceof Error
+            ? `We could not share the MP3 sample right now: ${error.message}`
+            : "We could not share the MP3 sample right now.",
+        );
+      }
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <section className="panel explorer-panel">
       <div className="panel-heading">
@@ -285,12 +435,31 @@ export default function SoundExplorer() {
       </div>
 
       <div className="explorer-toolbar">
-        <button className="primary-button" onClick={handleTogglePlayback} type="button">
-          {isPlaying ? "Pause sample" : "Play sample"}
-        </button>
+        <div className="explorer-actions">
+          <button className="primary-button" onClick={handleTogglePlayback} type="button">
+            {isPlaying ? "Pause sample" : "Play sample"}
+          </button>
+          <button
+            className="secondary-button"
+            disabled={isExporting}
+            onClick={handleDownloadMp3}
+            type="button"
+          >
+            {isExporting ? "Creating MP3..." : "Download 5-second MP3"}
+          </button>
+          <button
+            className="ghost-button"
+            disabled={isExporting}
+            onClick={handleShareMp3}
+            type="button"
+          >
+            Share sample
+          </button>
+        </div>
         <div className="explorer-status">
           <strong>{currentMode.label}</strong>
           <span>{status}</span>
+          {shareStatus ? <span>{shareStatus}</span> : null}
         </div>
       </div>
 
@@ -310,6 +479,31 @@ export default function SoundExplorer() {
           This view shows where the sample is carrying energy across low, mid,
           and high frequencies as you adjust the controls.
         </p>
+        <p className="muted-text">
+          You can export a 5-second MP3 from your current settings to text, email,
+          or play during an appointment.
+        </p>
+        {exportedSample ? (
+          <div className="export-card">
+            <div className="field-row">
+              <span>Generated sample</span>
+              <strong>5-second MP3</strong>
+            </div>
+            <audio className="export-audio" controls src={exportedSample.url}>
+              Your browser does not support audio playback.
+            </audio>
+            <div className="export-links">
+              <a
+                className="secondary-button export-link"
+                download={exportedSample.fileName}
+                href={exportedSample.url}
+              >
+                Download MP3
+              </a>
+              <span className="muted-text">{exportedSample.fileName}</span>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div className="explorer-grid">
