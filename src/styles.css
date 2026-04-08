@@ -43,8 +43,30 @@ input {
   font: inherit;
 }
 
+a {
+  color: inherit;
+}
+
 button {
   cursor: pointer;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  z-index: 1000;
+  padding: 0.7rem 0.95rem;
+  border-radius: 12px;
+  background: var(--accent-cool-strong);
+  color: #f7fbfd;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 180ms ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
 }
 
 input[type="range"] {
@@ -312,6 +334,14 @@ input[type="range"] {
   text-decoration: underline;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(79, 144, 180, 0.45);
+  outline-offset: 3px;
+}
+
 .companion-link-strong {
   padding: 0.85rem 1.05rem;
   border-radius: 14px;
@@ -545,6 +575,17 @@ input[type="range"] {
 
 .checklist li::marker {
   color: var(--accent-cool);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @media (max-width: 920px) {

@@ -416,6 +416,7 @@ export default function SoundExplorer() {
       <div className="mode-grid">
         {MODES.map((mode) => (
           <button
+            aria-pressed={params.mode === mode.value}
             className={params.mode === mode.value ? "mode-card active" : "mode-card"}
             key={mode.value}
             onClick={() => applyMode(mode)}
@@ -454,7 +455,7 @@ export default function SoundExplorer() {
             A short MP3 can be useful to share with your provider before or during a visit.
           </span>
         </div>
-        <div className="explorer-status">
+        <div className="explorer-status" aria-live="polite">
           <strong>{currentMode.label}</strong>
           <span>{status}</span>
         </div>

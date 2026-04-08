@@ -154,7 +154,9 @@ function SoundTypeGraphic({ title }) {
 
 export default function App() {
   return (
-    <main className="page-shell">
+    <>
+      <a className="skip-link" href="#main-content">Skip to main content</a>
+      <main className="page-shell" id="main-content">
       <section className="hero">
         <div>
           <p className="eyebrow">TinnitusGuide</p>
@@ -280,6 +282,7 @@ export default function App() {
           </p>
           <a
             className="companion-link"
+            aria-label="Open SereniTone in a new tab"
             href={SERENITONE_URL}
             rel="noreferrer"
             target="_blank"
@@ -299,6 +302,7 @@ export default function App() {
         </p>
         <a
           className="companion-link companion-link-strong"
+          aria-label="Go to SereniTone in a new tab"
           href={SERENITONE_URL}
           rel="noreferrer"
           target="_blank"
@@ -306,6 +310,7 @@ export default function App() {
           Go to SereniTone
         </a>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
