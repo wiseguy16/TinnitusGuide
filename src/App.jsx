@@ -1,6 +1,8 @@
 import React from "react";
 import SoundExplorer from "./components/SoundExplorer";
 
+const SERENITONE_URL = "https://wiseguy16.github.io/SereniTone/";
+
 const SOUND_TYPES = [
   {
     title: "High ringing",
@@ -100,6 +102,19 @@ function CareGraphic() {
   );
 }
 
+function DescriptionMattersGraphic() {
+  return (
+    <svg viewBox="0 0 320 110" className="inline-graphic" aria-hidden="true">
+      <rect x="16" y="18" width="288" height="74" rx="18" className="graphic-surface" />
+      <path d="M46 40 H120" className="graphic-axis soft" />
+      <path d="M46 56 H170" className="graphic-axis soft" />
+      <path d="M46 72 H142" className="graphic-axis soft" />
+      <circle cx="236" cy="55" r="18" className="graphic-note-ring" />
+      <path d="M228 55 l8 8 l14 -18" className="graphic-note-check" />
+    </svg>
+  );
+}
+
 function SoundTypeGraphic({ title }) {
   switch (title) {
     case "High ringing":
@@ -160,7 +175,7 @@ export default function App() {
       </section>
 
       <section className="intro-grid">
-        <article className="panel">
+        <article className="panel intro-panel">
           <p className="eyebrow">What You May Be Hearing</p>
           <h2>Internal sound can take many forms.</h2>
           <HearingRangeGraphic />
@@ -175,9 +190,10 @@ export default function App() {
           </p>
         </article>
 
-        <article className="panel">
+        <article className="panel intro-panel">
           <p className="eyebrow">Why Description Matters</p>
           <h2>Better words can reduce frustration.</h2>
+          <DescriptionMattersGraphic />
           <p>
             Many people know something feels wrong long before they know how to
             describe it. The more clearly you can describe pitch, roughness,
@@ -258,7 +274,37 @@ export default function App() {
               <li key={item}>{item}</li>
             ))}
           </ul>
+          <p className="muted-text">
+            After you have language for the sound itself, you can also try a supportive
+            listening environment in SereniTone.
+          </p>
+          <a
+            className="companion-link"
+            href={SERENITONE_URL}
+            rel="noreferrer"
+            target="_blank"
+          >
+            Open SereniTone
+          </a>
         </article>
+      </section>
+
+      <section className="panel bottom-cta-panel">
+        <p className="eyebrow">Try Relief Support</p>
+        <h2>Ready to try a sound tool designed to make tinnitus feel less front-and-center?</h2>
+        <p className="muted-text">
+          SereniTone is built to help you create a gentle, adjustable soundscape that may
+          reduce contrast with tinnitus and make it easier for the brain to let it fade into
+          the background.
+        </p>
+        <a
+          className="companion-link companion-link-strong"
+          href={SERENITONE_URL}
+          rel="noreferrer"
+          target="_blank"
+        >
+          Go to SereniTone
+        </a>
       </section>
     </main>
   );
