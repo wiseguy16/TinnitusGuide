@@ -59,6 +59,31 @@ npm run dev
 
 Then open the local Vite URL, usually `http://127.0.0.1:5173/`.
 
+## Deploying To GitHub Pages
+
+This project is set up to deploy to GitHub Pages through GitHub Actions.
+
+### One-time GitHub setup
+
+1. Push the project to the `wiseguy16/TinnitusGuide` repository.
+2. In GitHub, open `Settings` -> `Pages`.
+3. Under `Build and deployment`, set `Source` to `GitHub Actions`.
+4. Make sure your default branch is `main`.
+
+### Deploy flow
+
+Every push to `main` will trigger the workflow in [`.github/workflows/deploy.yml`](/Users/gwe48a/Documents/CodexCode/TinnitusGuide/.github/workflows/deploy.yml) and publish the contents of `dist/` to GitHub Pages.
+
+The Vite config in [`vite.config.js`](/Users/gwe48a/Documents/CodexCode/TinnitusGuide/vite.config.js) automatically sets the correct base path for:
+
+- a project site such as `https://wiseguy16.github.io/TinnitusGuide/`
+- or a root Pages site such as `https://wiseguy16.github.io/`
+
+### Notes
+
+- The `Sound Explorer` runs entirely in the browser, so audio still requires a user interaction before playback.
+- If you rename the repository later, the published base path will also change.
+
 ## Tech Stack
 
 - React
