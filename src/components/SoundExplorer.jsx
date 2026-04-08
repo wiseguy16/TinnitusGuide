@@ -51,8 +51,91 @@ function formatFrequency(value) {
   return `${Math.round(value)} Hz`;
 }
 
+function describePitch(value) {
+  if (value >= 8000) return "very high-pitched";
+  if (value >= 4000) return "high-pitched";
+  if (value >= 1800) return "upper-mid";
+  if (value >= 700) return "mid-pitched";
+  if (value >= 250) return "low-mid";
+  return "low-pitched";
+}
+
+function describeBrightness(value) {
+  if (value >= 0.8) return "very bright";
+  if (value >= 0.6) return "bright";
+  if (value >= 0.4) return "balanced";
+  if (value >= 0.2) return "soft";
+  return "very soft";
+}
+
+function describeRoughness(value) {
+  if (value >= 0.75) return "highly rough or textured";
+  if (value >= 0.5) return "noticeably rough";
+  if (value >= 0.25) return "slightly rough";
+  return "mostly smooth";
+}
+
+function describePulse(params) {
+  if (params.mode !== "pulse" && params.roughness < 0.3) {
+    return "not strongly pulsing";
+  }
+
+  if (params.pulseRate >= 5) {
+    return "fast fluttering";
+  }
+
+  if (params.pulseRate >= 2.2) {
+    return "moderately pulsing";
+  }
+
+  return "slow rhythmic pulsing";
+}
+
+function buildModePhrase(mode) {
+  switch (mode) {
+    case "ring":
+      return "a tonal ringing sound";
+    case "hiss":
+      return "a hiss or static-like sound";
+    case "buzz":
+      return "a buzzing or electrical sound";
+    case "hum":
+      return "a low humming sound";
+    case "pulse":
+      return "a pulsing or thumping sound";
+    default:
+      return "an internal sound";
+  }
+}
+
+function buildDescription(params, currentMode) {
+  const pitchText = describePitch(params.frequency);
+  const brightnessText = describeBrightness(params.brightness);
+  const roughnessText = describeRoughness(params.roughness);
+  const pulseText = describePulse(params);
+  const loudnessText =
+    params.loudness >= 0.18
+      ? "more noticeable in level"
+      : params.loudness >= 0.1
+        ? "moderate in level"
+        : "relatively soft in level";
+
+  const summary = `The closest match is ${buildModePhrase(params.mode)} that feels ${pitchText}, ${brightnessText}, and ${roughnessText}. It is centered around ${formatFrequency(params.frequency)} and feels ${loudnessText}.`;
+
+  const rhythm =
+    params.mode === "pulse" || params.roughness >= 0.3
+      ? `The sound pattern is ${pulseText}, around ${params.pulseRate.toFixed(1)} cycles per second.`
+      : "The sound pattern feels mostly steady rather than strongly rhythmic.";
+
+  const doctorScript = `I matched something closest to ${currentMode.label.toLowerCase()}, around ${formatFrequency(params.frequency)}. It feels ${brightnessText} and ${roughnessText}, and it is ${pulseText}.`;
+
+  return { summary, rhythm, doctorScript };
+}
+
 export default function SoundExplorer() {
   const simulatorRef = useRef(null);
+  const canvasRef = useRef(null);
+  const animationRef = useRef(null);
   const [params, setParams] = useState(INITIAL_STATE);
   const [isPlaying, setIsPlaying] = useState(false);
   const [status, setStatus] = useState("Choose a sound type, then press play.");
@@ -67,7 +150,90 @@ export default function SoundExplorer() {
     }
   }, [params, isPlaying]);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return undefined;
+    }
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      return undefined;
+    }
+
+    const drawIdle = () => {
+      const { width, height } = canvas;
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = "rgba(255, 255, 255, 0.03)";
+      context.fillRect(0, 0, width, height);
+      context.fillStyle = "rgba(240, 167, 104, 0.18)";
+      const bars = 40;
+      const barWidth = width / bars;
+      for (let index = 0; index < bars; index += 1) {
+        const barHeight = 18 + Math.sin(index * 0.55) * 10;
+        context.fillRect(index * barWidth + 2, height - barHeight - 16, barWidth - 5, barHeight);
+      }
+      context.fillStyle = "rgba(244, 239, 230, 0.5)";
+      context.font = "12px sans-serif";
+      context.fillText("Low", 10, height - 2);
+      context.fillText("Mid", width / 2 - 12, height - 2);
+      context.fillText("High", width - 34, height - 2);
+    };
+
+    const draw = () => {
+      const data = simulatorRef.current?.getFrequencyData();
+      const { width, height } = canvas;
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = "rgba(255, 255, 255, 0.03)";
+      context.fillRect(0, 0, width, height);
+
+      if (!data || !isPlaying) {
+        drawIdle();
+        animationRef.current = window.requestAnimationFrame(draw);
+        return;
+      }
+
+      const bars = 48;
+      const usableHeight = height - 20;
+      const barWidth = width / bars;
+
+      for (let index = 0; index < bars; index += 1) {
+        const dataIndex = Math.min(
+          data.length - 1,
+          Math.floor((index / bars) ** 1.8 * data.length),
+        );
+        const magnitude = data[dataIndex] / 255;
+        const boostedMagnitude = Math.max(0, magnitude - 0.035) / 0.965;
+        const liftedMagnitude = Math.pow(boostedMagnitude, 0.44);
+        const barHeight = Math.max(4, liftedMagnitude * usableHeight * 0.92);
+        const x = index * barWidth + 2;
+        const y = usableHeight - barHeight;
+        const gradient = context.createLinearGradient(0, y, 0, usableHeight);
+        gradient.addColorStop(0, "#ffd7aa");
+        gradient.addColorStop(1, "#f0a768");
+        context.fillStyle = gradient;
+        context.fillRect(x, y, barWidth - 4, barHeight);
+      }
+
+      context.fillStyle = "rgba(244, 239, 230, 0.5)";
+      context.font = "12px sans-serif";
+      context.fillText("Low", 10, height - 2);
+      context.fillText("Mid", width / 2 - 12, height - 2);
+      context.fillText("High", width - 34, height - 2);
+      animationRef.current = window.requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    return () => {
+      if (animationRef.current) {
+        window.cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isPlaying]);
+
   const currentMode = MODES.find((mode) => mode.value === params.mode) ?? MODES[0];
+  const description = buildDescription(params, currentMode);
 
   const applyMode = (mode) => {
     setParams((current) => ({
@@ -128,6 +294,24 @@ export default function SoundExplorer() {
         </div>
       </div>
 
+      <div className="waveform-panel">
+        <div className="field-row">
+          <span>Real-time analyzer</span>
+          <strong>{isPlaying ? "Live" : "Idle"}</strong>
+        </div>
+        <canvas
+          aria-label="Real-time analyzer"
+          className="waveform-canvas"
+          height="180"
+          ref={canvasRef}
+          width="960"
+        />
+        <p className="muted-text">
+          This view shows where the sample is carrying energy across low, mid,
+          and high frequencies as you adjust the controls.
+        </p>
+      </div>
+
       <div className="explorer-grid">
         <label className="field">
           <div className="field-row">
@@ -135,7 +319,7 @@ export default function SoundExplorer() {
             <strong>{formatFrequency(params.frequency)}</strong>
           </div>
           <input
-            max="9000"
+            max="16000"
             min="80"
             onChange={(event) =>
               setParams((current) => ({ ...current, frequency: Number(event.target.value) }))
@@ -218,14 +402,14 @@ export default function SoundExplorer() {
 
       <div className="appointment-card">
         <p className="eyebrow">Bring This To Your Appointment</p>
-        <h3>How to describe what you matched</h3>
-        <ul>
-          <li>Closest match: <strong>{currentMode.label.toLowerCase()}</strong></li>
-          <li>Pitch / center: <strong>{formatFrequency(params.frequency)}</strong></li>
-          <li>Brightness: <strong>{params.brightness.toFixed(2)}</strong></li>
-          <li>Roughness: <strong>{params.roughness.toFixed(2)}</strong></li>
-          <li>Pulsing quality: <strong>{params.pulseRate.toFixed(1)} Hz</strong></li>
-        </ul>
+        <h3>How to describe what you matched right now</h3>
+        <p>{description.summary}</p>
+        <p>{description.rhythm}</p>
+        <div className="appointment-example">
+          <p>
+            <strong>You could say:</strong> &ldquo;{description.doctorScript}&rdquo;
+          </p>
+        </div>
       </div>
     </section>
   );

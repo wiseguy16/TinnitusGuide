@@ -15,6 +15,8 @@ export class TinnitusSimulator {
   constructor() {
     this.context = null;
     this.masterGain = null;
+    this.analyser = null;
+    this.frequencyData = null;
     this.primaryOsc = null;
     this.secondaryOsc = null;
     this.noiseSource = null;
@@ -30,8 +32,15 @@ export class TinnitusSimulator {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       this.context = new AudioContextClass();
       this.masterGain = this.context.createGain();
+      this.analyser = this.context.createAnalyser();
+      this.analyser.fftSize = 2048;
+      this.analyser.smoothingTimeConstant = 0.91;
+      this.analyser.minDecibels = -110;
+      this.analyser.maxDecibels = -10;
+      this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
       this.masterGain.gain.value = 0;
-      this.masterGain.connect(this.context.destination);
+      this.masterGain.connect(this.analyser);
+      this.analyser.connect(this.context.destination);
       this.noiseBuffer = createNoiseBuffer(this.context);
     }
 
@@ -185,5 +194,14 @@ export class TinnitusSimulator {
     this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, this.context.currentTime);
     this.masterGain.gain.linearRampToValueAtTime(0, this.context.currentTime + 0.08);
     window.setTimeout(() => this.stopNodes(), 120);
+  }
+
+  getFrequencyData() {
+    if (!this.analyser || !this.frequencyData) {
+      return null;
+    }
+
+    this.analyser.getByteFrequencyData(this.frequencyData);
+    return this.frequencyData;
   }
 }

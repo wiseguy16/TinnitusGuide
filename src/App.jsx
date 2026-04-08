@@ -169,19 +169,6 @@ export default function App() {
           </ul>
         </article>
       </section>
-
-      <section className="panel appointment-panel">
-        <p className="eyebrow">Bring This Description</p>
-        <h2>A simple format you can use in an appointment</h2>
-        <div className="appointment-example">
-          <p>
-            <strong>Example:</strong> “The sound I notice is closest to a high
-            ringing tone with a little hiss mixed in. I notice it most in quiet
-            rooms and at bedtime. It seems easier to ignore when there is soft
-            background sound. It is usually steady, not pulsing.”
-          </p>
-        </div>
-      </section>
     </main>
   );
 }
