@@ -460,6 +460,14 @@ export default function SoundExplorer() {
         </div>
       </div>
 
+      <div className="explorer-tip-card">
+        <strong>How to use this tool</strong>
+        <p>
+          Start with the closest sound type, keep the sample level low, and use
+          the controls to get closer, not to create a perfect clinical match.
+        </p>
+      </div>
+
       <div className="waveform-panel">
         <div className="field-row">
           <span>Real-time analyzer</span>
@@ -475,6 +483,10 @@ export default function SoundExplorer() {
         <p className="muted-text">
           This view shows where the sample is carrying energy across low, mid,
           and high frequencies as you adjust the controls.
+        </p>
+        <p className="muted-text">
+          Export and sharing happen entirely in your browser. A short sample can
+          be helpful to play or send before an appointment.
         </p>
       </div>
 

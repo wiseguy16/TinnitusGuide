@@ -419,6 +419,24 @@ input[type="range"] {
   color: var(--soft-ink);
 }
 
+.explorer-tip-card {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  background: rgba(79, 144, 180, 0.07);
+  border: 1px solid rgba(79, 144, 180, 0.12);
+}
+
+.explorer-tip-card strong,
+.explorer-tip-card p {
+  margin: 0;
+}
+
+.explorer-tip-card p {
+  margin-top: 0.35rem;
+  color: var(--soft-ink);
+}
+
 .explorer-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
