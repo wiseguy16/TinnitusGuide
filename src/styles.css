@@ -118,6 +118,109 @@ input[type="range"] {
   margin-left: auto;
 }
 
+.inline-graphic {
+  width: 100%;
+  max-width: 320px;
+  display: block;
+  margin: 0.85rem 0 1rem;
+}
+
+.card-graphic {
+  width: 100%;
+  max-width: 118px;
+  height: 58px;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.graphic-surface {
+  fill: rgba(226, 239, 246, 0.86);
+  stroke: rgba(83, 124, 151, 0.18);
+  stroke-width: 1.5;
+}
+
+.graphic-axis {
+  fill: none;
+  stroke: rgba(83, 124, 151, 0.5);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.graphic-axis.soft {
+  stroke: rgba(83, 124, 151, 0.26);
+}
+
+.graphic-spectrum {
+  fill: none;
+  stroke: url(#rangeLine);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.graphic-mark {
+  fill: var(--accent-cool);
+}
+
+.graphic-mark.soft {
+  fill: rgba(79, 144, 180, 0.5);
+}
+
+.graphic-mark.warm {
+  fill: var(--accent-warm);
+}
+
+.graphic-label {
+  fill: var(--soft-ink);
+  font-size: 11px;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+.graphic-wave {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.graphic-wave.cool {
+  stroke: var(--accent-cool-strong);
+}
+
+.graphic-wave.soft {
+  stroke: rgba(79, 144, 180, 0.58);
+}
+
+.graphic-wave.warm {
+  stroke: var(--accent-warm);
+}
+
+.graphic-chip.cool {
+  fill: rgba(79, 144, 180, 0.18);
+  stroke: rgba(79, 144, 180, 0.24);
+}
+
+.graphic-chip.warm {
+  fill: rgba(201, 141, 83, 0.16);
+  stroke: rgba(201, 141, 83, 0.22);
+}
+
+.graphic-alert-ring {
+  fill: rgba(201, 141, 83, 0.08);
+  stroke: rgba(201, 141, 83, 0.6);
+  stroke-width: 2.5;
+}
+
+.graphic-alert-line {
+  fill: none;
+  stroke: rgba(201, 141, 83, 0.9);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.graphic-alert-dot {
+  fill: rgba(201, 141, 83, 0.9);
+}
+
 .hero-ring {
   fill: rgba(79, 144, 180, 0.08);
   stroke: rgba(79, 144, 180, 0.55);

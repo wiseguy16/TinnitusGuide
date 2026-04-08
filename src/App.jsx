@@ -50,6 +50,93 @@ function HeroIllustration() {
   );
 }
 
+function HearingRangeGraphic() {
+  return (
+    <svg viewBox="0 0 320 110" className="inline-graphic" aria-hidden="true">
+      <defs>
+        <linearGradient id="rangeLine" x1="0%" x2="100%" y1="0%" y2="0%">
+          <stop offset="0%" stopColor="rgba(79,144,180,0.35)" />
+          <stop offset="55%" stopColor="rgba(79,144,180,0.7)" />
+          <stop offset="100%" stopColor="rgba(201,141,83,0.7)" />
+        </linearGradient>
+      </defs>
+      <rect x="12" y="22" width="296" height="66" rx="18" className="graphic-surface" />
+      <path d="M30 70 H290" className="graphic-axis" />
+      <path d="M42 68 C82 58, 106 48, 138 62 S204 84, 248 52 280 44, 290 48" className="graphic-spectrum" />
+      <circle cx="84" cy="57" r="5" className="graphic-mark" />
+      <circle cx="186" cy="72" r="5" className="graphic-mark soft" />
+      <circle cx="256" cy="50" r="6" className="graphic-mark warm" />
+      <text x="28" y="96" className="graphic-label">Low</text>
+      <text x="146" y="96" className="graphic-label">Mid</text>
+      <text x="262" y="96" className="graphic-label">High</text>
+    </svg>
+  );
+}
+
+function DescriptionGraphic() {
+  return (
+    <svg viewBox="0 0 320 120" className="inline-graphic" aria-hidden="true">
+      <rect x="16" y="16" width="288" height="88" rx="20" className="graphic-surface" />
+      <path d="M42 76 C62 46, 84 46, 104 76 S146 106, 166 76 208 46, 228 76 270 102, 286 66" className="graphic-wave cool" />
+      <path d="M42 84 C62 68, 84 66, 104 84 S146 98, 166 84 208 64, 228 84 270 96, 286 88" className="graphic-wave soft" />
+      <rect x="42" y="28" width="58" height="14" rx="7" className="graphic-chip cool" />
+      <rect x="112" y="28" width="72" height="14" rx="7" className="graphic-chip soft" />
+      <rect x="196" y="28" width="52" height="14" rx="7" className="graphic-chip warm" />
+    </svg>
+  );
+}
+
+function CareGraphic() {
+  return (
+    <svg viewBox="0 0 320 110" className="inline-graphic" aria-hidden="true">
+      <rect x="16" y="18" width="288" height="74" rx="18" className="graphic-surface" />
+      <circle cx="66" cy="55" r="18" className="graphic-alert-ring" />
+      <path d="M66 44 v18" className="graphic-alert-line" />
+      <circle cx="66" cy="69" r="2.8" className="graphic-alert-dot" />
+      <path d="M110 44 H270" className="graphic-axis soft" />
+      <path d="M110 58 H250" className="graphic-axis soft" />
+      <path d="M110 72 H228" className="graphic-axis soft" />
+    </svg>
+  );
+}
+
+function SoundTypeGraphic({ title }) {
+  switch (title) {
+    case "High ringing":
+      return (
+        <svg viewBox="0 0 120 68" className="card-graphic" aria-hidden="true">
+          <path d="M12 54 C24 22, 36 22, 48 54 S72 86, 84 30 100 14, 108 54" className="graphic-wave cool" />
+        </svg>
+      );
+    case "Hiss or static":
+      return (
+        <svg viewBox="0 0 120 68" className="card-graphic" aria-hidden="true">
+          <path d="M10 20 L18 48 L26 24 L34 50 L42 18 L50 48 L58 26 L66 50 L74 20 L82 46 L90 28 L98 48 L106 24" className="graphic-wave soft" />
+        </svg>
+      );
+    case "Buzz or electrical sound":
+      return (
+        <svg viewBox="0 0 120 68" className="card-graphic" aria-hidden="true">
+          <path d="M12 48 H26 V22 H42 V48 H58 V22 H74 V48 H90 V22 H108 V48" className="graphic-wave cool" />
+        </svg>
+      );
+    case "Low hum":
+      return (
+        <svg viewBox="0 0 120 68" className="card-graphic" aria-hidden="true">
+          <path d="M10 48 C24 36, 38 36, 52 48 S80 60, 94 48 108 36, 110 44" className="graphic-wave soft" />
+        </svg>
+      );
+    case "Pulse or whoosh":
+      return (
+        <svg viewBox="0 0 120 68" className="card-graphic" aria-hidden="true">
+          <path d="M12 48 H30 L38 24 L50 54 L62 18 L74 48 H108" className="graphic-wave warm" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
 export default function App() {
   return (
     <main className="page-shell">
@@ -76,6 +163,7 @@ export default function App() {
         <article className="panel">
           <p className="eyebrow">What You May Be Hearing</p>
           <h2>Internal sound can take many forms.</h2>
+          <HearingRangeGraphic />
           <p>
             Not everybody hears the same way. Some people notice an extra layer
             of sound that other people do not hear. The medical word often used
@@ -110,6 +198,7 @@ export default function App() {
         <div className="sound-grid">
           {SOUND_TYPES.map((item) => (
             <article className="sound-card" key={item.title}>
+              <SoundTypeGraphic title={item.title} />
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </article>
@@ -122,6 +211,7 @@ export default function App() {
           <p className="eyebrow">How To Describe It</p>
           <h2>Use simple listening categories</h2>
         </div>
+        <DescriptionGraphic />
         <div className="describe-grid">
           <article className="describe-card">
             <h3>Pitch</h3>
@@ -148,6 +238,7 @@ export default function App() {
         <article className="panel">
           <p className="eyebrow">When To Seek Care</p>
           <h2>Some patterns deserve earlier attention.</h2>
+          <CareGraphic />
           <ul className="checklist">
             {CARE_FLAGS.map((item) => (
               <li key={item}>{item}</li>
