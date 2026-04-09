@@ -1,5 +1,5 @@
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-const MASTER_OUTPUT_SCALE = 0.49;
+const MASTER_OUTPUT_SCALE = 0.32;
 
 function createNoiseBuffer(context) {
   const buffer = context.createBuffer(1, context.sampleRate * 2, context.sampleRate);
