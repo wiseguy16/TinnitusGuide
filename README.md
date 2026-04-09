@@ -198,3 +198,12 @@ The Vite base path is configured in [`vite.config.js`](/Users/gwe48a/Documents/C
 - React
 - Vite
 - Web Audio API
+
+## Copyright & License
+
+Copyright (c) 2026 Greg Weiss. All rights reserved.
+
+This repository is proprietary. No copying, modification, distribution, sublicensing, sale,
+or creation of derivative works is permitted without prior written permission from Greg Weiss.
+
+See [LICENSE](/Users/gwe48a/Documents/CodexCode/TinnitusGuide/LICENSE).
