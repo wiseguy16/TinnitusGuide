@@ -1,4 +1,5 @@
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+const MASTER_OUTPUT_SCALE = 0.49;
 
 function createNoiseBuffer(context) {
   const buffer = context.createBuffer(1, context.sampleRate * 2, context.sampleRate);
@@ -22,7 +23,7 @@ function wireSimulationGraph(context, destination, params, noiseBuffer) {
   } = params;
 
   const outputGain = context.createGain();
-  outputGain.gain.value = clamp(loudness, 0, 0.35);
+  outputGain.gain.value = clamp(loudness * MASTER_OUTPUT_SCALE, 0, 0.35);
   outputGain.connect(destination);
 
   const startedNodes = [];
@@ -80,7 +81,7 @@ function wireSimulationGraph(context, destination, params, noiseBuffer) {
         : clamp(roughness * 0.22, 0, 0.18);
     modulationOsc.connect(modulationGain);
     modulationGain.connect(outputGain.gain);
-    outputGain.gain.value = clamp(loudness, 0, 0.28);
+    outputGain.gain.value = clamp(loudness * MASTER_OUTPUT_SCALE, 0, 0.28);
     startedNodes.push(modulationOsc);
   }
 
@@ -199,7 +200,7 @@ export class TinnitusSimulator {
 
     const master = this.masterGain;
     const outputGain = this.context.createGain();
-    outputGain.gain.value = clamp(loudness, 0, 0.35);
+    outputGain.gain.value = clamp(loudness * MASTER_OUTPUT_SCALE, 0, 0.35);
     outputGain.connect(master);
 
     const makeOsc = (type, freq, gainValue) => {
@@ -256,7 +257,7 @@ export class TinnitusSimulator {
           : clamp(roughness * 0.22, 0, 0.18);
       this.modulationOsc.connect(this.modulationGain);
       this.modulationGain.connect(outputGain.gain);
-      outputGain.gain.value = clamp(loudness, 0, 0.28);
+      outputGain.gain.value = clamp(loudness * MASTER_OUTPUT_SCALE, 0, 0.28);
       this.modulationOsc.start();
     }
 
