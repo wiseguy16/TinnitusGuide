@@ -2,35 +2,35 @@
 
 TinnitusGuide is a browser-based education and self-description companion site for people trying to make sense of ringing, hissing, buzzing, humming, pulsing, or other internal sound.
 
-It does not try to soothe the sound directly. Instead, it helps the user understand what they may be hearing, build language around it, and prepare for clearer conversations with clinicians. It also links into `SereniTone` when the user is ready to try supportive sound relief.
+It does not try to soothe the sound directly. Instead, it helps the user understand what they may be hearing, build language around it, compare sound qualities in a browser explorer, and prepare for clearer conversations with clinicians. When the user is ready for relief-focused sound support, it points them into `SereniTone`.
 
 ## Who It's For
 
 TinnitusGuide is for people who:
 
-- notice internal sound but do not know how to describe it
+- notice internal sound but do not know how to describe it clearly
 - feel frustrated trying to explain what they hear to an ENT or audiologist
-- want a calmer, clearer explanation of tinnitus-related sound qualities
-- want a safe, non-diagnostic tool to compare pitch, hiss, buzz, hum, and pulse
+- want a calmer explanation of tinnitus-like sound qualities without heavy jargon
+- want a safe, non-diagnostic browser tool to compare pitch, hiss, buzz, hum, and pulse
 
-It is especially useful for people in the “confused but motivated” stage: they know something is happening, but do not yet have good vocabulary for it.
+It is especially useful for people in the “confused but motivated” stage: they know something is happening, but do not yet have the vocabulary to describe it well.
 
 ## Problem
 
 Many people know that something sounds “off” long before they know how to describe it.
 
-That creates several problems:
+That creates several practical problems:
 
-- they struggle to explain the sound itself
-- they do not know which parts matter clinically
-- they feel overwhelmed by jargon
-- they arrive at appointments with vague language like “ringing” that misses important detail
+- they struggle to explain what the sound is actually like
+- they do not know which details may matter clinically
+- they feel overwhelmed by medical language
+- they arrive at appointments with vague descriptions like “ringing” that miss important detail
 
-There is an opportunity to create a better first step: a clear, non-diagnostic site that helps people observe, compare, and describe their tinnitus-like sound before moving into either medical conversation or relief-oriented tools.
+This creates an opportunity for a better first step: a non-diagnostic educational site that helps users observe, compare, and describe their tinnitus-like perception before they move into either clinical conversation or relief-oriented tools.
 
 ## Solution
 
-TinnitusGuide is a content-first companion product that combines education, plain-language categorization, and a browser sound explorer.
+TinnitusGuide is a content-first companion product that combines education, visual explanation, and a browser sound explorer.
 
 Current prototype behavior:
 
@@ -43,17 +43,18 @@ Current prototype behavior:
   - pulse / whoosh
 - teaches users how to describe pitch, tone, roughness, rhythm, and timing
 - highlights patterns that may deserve earlier clinical attention
-- includes a `Sound Explorer` for comparing approximate sound qualities
+- includes a `Sound Explorer` that lets users compare approximate sound qualities
+- includes a real-time analyzer so users can see the current sound profile
 - generates dynamic appointment-ready language from the user’s current explorer settings
 - allows the user to export a 5-second MP3 sample of their current explorer match
-- links to `SereniTone` when the user is ready to try a relief-focused soundscape
+- links into `SereniTone` when the user is ready to try a relief-focused soundscape
 
 Why this solution:
 
-- it tackles the “I don’t know how to explain this” problem directly
-- it creates useful vocabulary without pretending to diagnose
+- it directly addresses the “I don’t know how to explain this” problem
+- it creates better vocabulary without pretending to diagnose
 - it gives the user something concrete to bring into an appointment
-- it separates education/description from relief/treatment-style interaction
+- it separates education and self-description from relief and tuning
 
 ## Key Decisions & Tradeoffs
 
@@ -65,29 +66,29 @@ Decision:
 
 Why:
 
-- many users first need language and orientation
-- this keeps the product clearer and less overloaded
+- many users first need orientation and language
+- it keeps the product clearer and more focused
 
 Tradeoff:
 
-- it does not directly solve comfort or masking on its own
+- it does not directly solve comfort or masking by itself
 
 ### 2. Browser sound explorer instead of clinical matching
 
 Decision:
 
-- include a simple comparison tool that helps users say “this is closer”
+- include an approximate explorer that helps users say “this is closer”
 
 Why:
 
 - useful for self-description
-- feasible in a browser
+- feasible in a static browser-based product
 - more approachable than a formal clinical test
 
 Tradeoff:
 
-- it is approximate, not diagnostic
-- the sound explorer is descriptive, not medically validated measurement
+- it is descriptive, not diagnostic
+- the sound explorer is not a medically validated measurement tool
 
 ### 3. Companion split with SereniTone
 
@@ -97,28 +98,45 @@ Decision:
 
 Why:
 
-- the user problem here is understanding and description
-- SereniTone solves a different problem: supportive sound relief
+- understanding what you hear is a different problem from building a soothing soundscape
+- the split keeps each product more legible
 
 Tradeoff:
 
-- users may switch between two related sites
-- shared design language has to be managed intentionally
+- users may move between two related sites
+- the shared brand language has to be managed intentionally
 
 ### 4. Clinical-leaning visual language instead of purely soothing design
 
 Decision:
 
-- keep the family resemblance to SereniTone, but use cooler and more clinical styling
+- keep the family resemblance to SereniTone, but shift TinnitusGuide toward a cooler, more clinical visual system
 
 Why:
 
 - supports trust and clarity
-- fits the educational/appointment-prep role better
+- better matches the educational and appointment-prep role
 
 Tradeoff:
 
-- the product feels less cozy than SereniTone by design
+- it feels less cozy than SereniTone by design
+
+### 5. In-browser MP3 export instead of server-side rendering
+
+Decision:
+
+- render and encode the sample in the browser
+
+Why:
+
+- keeps the project fully static-hostable
+- avoids backend storage and processing complexity
+- lets the user quickly create something shareable
+
+Tradeoff:
+
+- browser behavior varies more across devices
+- export and share behavior needs more cross-browser tuning
 
 ## Scope Decisions
 
@@ -126,7 +144,7 @@ Tradeoff:
 
 - educational homepage sections
 - common tinnitus-sound categories
-- explanatory visuals
+- explanatory visuals and infographics
 - sound explorer with adjustable sound qualities
 - real-time analyzer
 - dynamic appointment-description output
@@ -139,21 +157,22 @@ Tradeoff:
 - diagnosis
 - hearing testing
 - clinician interpretation
-- account system
+- user accounts
 - saved user history
 - backend storage
 - medical records integration
 
-These decisions kept the site focused on a single strong job: helping users understand and describe what they hear.
+These decisions kept the site focused on a single strong job: helping users understand and describe what they hear more clearly.
 
 ## What I Would Do Next With More Time
 
-- improve the sound explorer so it can capture more nuanced mixed or shifting sound patterns
-- add printable/shareable appointment summary output
-- add clearer one-ear vs both-ears description support
+- make the sound explorer better at mixed or shifting sound patterns
+- add printable and shareable appointment summary output
+- add clearer support for one-ear vs both-ears descriptions
 - add more guided branching for tonal vs noise-like vs pulsing patterns
-- further refine mobile audio export/share behavior across browsers
-- user-test the educational flow with real tinnitus sufferers and clinicians
+- continue refining mobile export and sharing across browsers
+- test the educational flow with real tinnitus sufferers and clinicians
+- possibly add a more structured “describe this to your doctor” workflow
 
 ## Current Progress
 
@@ -163,9 +182,11 @@ The current prototype is live and includes:
 - educational content for non-experts
 - section-specific visuals that support understanding
 - a browser sound explorer
+- a real-time analyzer
 - dynamic clinician-facing language based on current settings
 - MP3 export for easy sharing
 - cross-links to SereniTone as the relief-focused companion
+- tuned default playback output to reduce jarring starts
 
 ## Running Locally
 
@@ -174,7 +195,7 @@ npm install
 npm run dev
 ```
 
-Then open the local Vite URL, usually `http://127.0.0.1:5173/` or the next available port.
+Then open the local Vite URL shown in the terminal.
 
 ## Deploying To GitHub Pages
 
@@ -198,6 +219,7 @@ The Vite base path is configured in [`vite.config.js`](/Users/gwe48a/Documents/C
 - React
 - Vite
 - Web Audio API
+- `lamejs` for in-browser MP3 export
 
 ## Copyright & License
 
